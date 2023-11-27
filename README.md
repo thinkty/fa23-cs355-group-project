@@ -12,7 +12,7 @@ Bob is able to obtain Alice’s public key. Bob and Alice do not have access to 
 
 ### Security Goal
 
-If the RSA assumption holds, and H is modeled as a random function mapping onto ℤ*N, then RSA-FDH is secure s.t. the adversary should not be able to forge a valid signature on any message not authenticated by the sender. Alice and Bob should only be able to learn the number of overlaps, and the contents of the overlapping segment.
+If the RSA assumption holds, and H is a irreversible hash function that is modeled as a random function mapping onto ℤ*N, then RSA-FDH is secure s.t. the adversary should not be able to forge a valid signature on any message not authenticated by the sender. Alice and Bob should only be able to learn the number of overlaps, and the contents of the overlapping segment.
 
 ### Signature Scheme
 
