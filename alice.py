@@ -8,6 +8,7 @@ import socketserver
 import sys
 
 responses = []
+public_key_pem = None
 
 class SignatureRequestHandler(socketserver.BaseRequestHandler):
     def handle(self) -> None:
