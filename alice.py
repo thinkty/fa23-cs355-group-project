@@ -8,7 +8,6 @@ import socketserver
 import sys
 
 responses = []
-public_key_pem = None
 
 class SignatureRequestHandler(socketserver.BaseRequestHandler):
     def handle(self) -> None:
@@ -23,9 +22,6 @@ class SignatureRequestHandler(socketserver.BaseRequestHandler):
 
         # Send the public key, message, and signature
         print("Sending segment {}".format(segnum))
-        # print(len(public_key_pem))
-        # print(len(responses[segnum][0]))
-        # print(len(responses[segnum][1]))
         self.request.sendall(public_key_pem + responses[segnum][0] + responses[segnum][1])
         self.request.close()
 
