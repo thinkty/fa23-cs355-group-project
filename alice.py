@@ -8,7 +8,6 @@ import socketserver
 import sys
 
 responses = []
-public_key_pem = None
 
 class SignatureRequestHandler(socketserver.BaseRequestHandler):
     def handle(self) -> None:
@@ -16,14 +15,14 @@ class SignatureRequestHandler(socketserver.BaseRequestHandler):
         segnum = int(data.decode('utf-8'))
 
         # Get segment number from the request (between 0 and 4)
-        if segnum < 0 or segnum > 4 or public_key_pem is None or len(responses) != 5:
+        if segnum < 0 or segnum > 4 or len(responses) != 5:
             self.request.send('ERR'.encode('utf-8'))
             self.request.close()
             return
 
         # Send the public key, message, and signature
         print("Sending segment {}".format(segnum))
-        self.request.sendall(public_key_pem + responses[segnum][0] + responses[segnum][1])
+        self.request.sendall(responses[segnum][0] + responses[segnum][1])
         self.request.close()
 
 class SignatureServer(socketserver.TCPServer):
@@ -71,11 +70,13 @@ if __name__ == "__main__":
     )
     public_key = private_key.public_key()
     
-    # Serialize the public key into PEM format to be sent to any requester
+    # Serialize the public key into PEM format and save (We assume that Alice and Bob share the public key)
     public_key_pem = public_key.public_bytes(
         encoding=serialization.Encoding.PEM,
         format=serialization.PublicFormat.SubjectPublicKeyInfo
     )
+    with open('alice_public_key.pem', 'wb') as public_key_file:
+        public_key_file.write(public_key_pem)
 
     # Sign each segment and create responses in advance
     for i, segment_digest in enumerate(digests):

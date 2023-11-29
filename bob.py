@@ -1,5 +1,6 @@
 
 import argparse
+from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
 import socket
@@ -17,13 +18,16 @@ def connectAndRequest(segnum: int) -> str:
     clientsocket.send(str(segnum).encode('utf-8'))
 
     # Receive public key, message, and signature
-    public_key_pem = clientsocket.recv(451)
     message = clientsocket.recv(65) # 1 byte of segnum, 32 bytes (256 bits) of digest (but x2 since hex)
-    signature = clientsocket.recv(256) # signature of 2048 bit key size has 256 bytes
+    signature = clientsocket.recv(256) # signature of 2048 bit key size has 256 (2048 bits) bytes
     clientsocket.close()
 
+    # Open Alice's public key (We assume that the public key is shared with Bob safely)
+    with open('alice_public_key.pem', 'rb') as public_key_file:
+        public_key_bytes = public_key_file.read()
+    public_key = serialization.load_pem_public_key(public_key_bytes, default_backend())
+
     # Verify assuming that the adversary cannot modify public key
-    public_key = serialization.load_pem_public_key(public_key_pem)
     try:
         public_key.verify(
             signature,
@@ -38,7 +42,6 @@ def connectAndRequest(segnum: int) -> str:
     except Exception as e:
         print('error: {}'.format(e))
         return ''
-
 
 if __name__ == "__main__":
 
